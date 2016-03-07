@@ -1,0 +1,4 @@
+www/*
+.vagrant
+!.gitignore
+.idea
