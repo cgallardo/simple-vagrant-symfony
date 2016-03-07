@@ -159,72 +159,6 @@ class php-setup {
   }
 }
 
-class composer {
-  exec { 'install composer php dependency management':
-    command => 'curl -s http://getcomposer.org/installer | php -- --install-dir=/usr/bin && mv /usr/bin/composer.phar /usr/bin/composer',
-    creates => '/usr/bin/composer',
-    require => [Package['php5-cli'], Package['curl']],
-  }
-}
-
-class maildev {
-
-  class { 'nodejs':
-    version => 'v0.10.37'
-  }
-
-  package { 'maildev':
-    provider => 'npm',
-    require  => Class['nodejs']
-  }
-
-  file { "maildev_init":
-    path    => "/etc/init.d/maildev",
-    source  => "/vagrant/files/maildev/maildev",
-    mode    => "0755",
-    require => Package['maildev'],
-  }
-
-  file { "maildev_log":
-    path    => "/var/log/maildev.log",
-    ensure  => "file",
-    owner   => "vagrant",
-    mode    => "0644",
-    require => File['maildev_init'],
-  }
-
-  service { 'maildev':
-    enable  => true,
-    ensure  => 'running',
-    require => File['maildev_log'],
-  }
-
-  file { '/etc/nginx/sites-available/webmail.runator.dev':
-    source  => '/vagrant/files/nginx/webmail.runator.dev',
-    owner   => root,
-    group   => root,
-    require => Package['nginx'],
-    notify  => Service['nginx'],
-  }
-  ->
-  file { '/etc/nginx/sites-enabled/webmail.runator.dev':
-    ensure => 'link',
-    target => '/etc/nginx/sites-available/webmail.runator.dev',
-  }
-
-  file { '/usr/bin/maildev':
-    ensure => 'link',
-    target => '/usr/local/node/node-v0.10.37/lib/node_modules/maildev/bin/maildev',
-    require => Service['maildev']
-  }
-  ->
-  file { '/usr/bin/node':
-    ensure => 'link',
-    target => '/usr/local/node/node-v0.10.37/bin/node',
-  }
-
-}
-
 class memcached {
   package { "memcached":
     ensure => present,
@@ -244,6 +178,4 @@ include system-update
 include dev-packages
 include nginx-setup
 include php-setup
-include composer
-include maildev
 include memcached

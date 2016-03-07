@@ -1,6 +1,6 @@
 server {
     listen       80;
-    server_name  runator.dev runator.local local.runator.dev;
+    server_name  symfony.dev symfony.local local.symfony.dev;
     root /vagrant/www/web;
     index app.php app_dev.php;
 
